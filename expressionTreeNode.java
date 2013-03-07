@@ -112,7 +112,7 @@ class expressionTreeNode {
     // Returns the value of the the expression rooted at a given node
     // when x has a certain value
     double evaluate(double x) {
-    	System.out.println(this.getLeftChild() + " " + this.getRightChild());
+        System.out.println(this.getLeftChild() + " " + this.getRightChild());
     	if (this.getValue().equals("mult")) {
     		//System.out.println("Mult: " + this.getLeftChild().evaluate(x) * this.getRightChild().evaluate(x));
     		return (this.getLeftChild().evaluate(x) * this.getRightChild().evaluate(x));
@@ -128,9 +128,13 @@ class expressionTreeNode {
     		return (Math.cos(this.getLeftChild().evaluate(x)));
     	} else if (this.getValue().equals("exp")) {
     		return (Math.exp(this.getLeftChild().evaluate(x)));
+    	} else if (this.getValue(). equals("x")) {
+    		System.out.println("x Leaf");
+    		return x;
     	} else {
     		System.out.println("Leaf");
-    		return (((Number)this.getValue()).intValue());
+    		toString().this.deepCopy();
+    		return 0;
     	}
     }                         
 
