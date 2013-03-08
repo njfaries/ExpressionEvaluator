@@ -128,22 +128,44 @@ class expressionTreeNode {
     		return (Math.cos(this.getLeftChild().evaluate(x)));
     	} else if (this.getValue().equals("exp")) {
     		return (Math.exp(this.getLeftChild().evaluate(x)));
-    	} else if (this.getValue(). equals("x")) {
+    	} else if (this.getValue().equals("x")) {
     		System.out.println("x Leaf");
     		return x;
     	} else {
     		System.out.println("Leaf");
-    		toString().this.deepCopy();
-    		return 0;
+    		String value = this.toString();
+    		return Integer.parseInt(value);
     	}
     }                         
 
     /* returns the root of a new expression tree representing the derivative of the
     expression represented by the tree rooted at the node on which it is called ***/
     expressionTreeNode differentiate() {
-    // WRITE YOUR CODE HERE
-
-    return null; // remove this
+    	expressionTreeNode derivative = this.deepCopy();
+    	if (derivative.getValue().equals("mult")) {
+    		//f(x)*g(x): set to (df(x)/dx * g(x)) + (dg(x)/dx * f(x))
+    		derivative.setValue("add");
+    	} else if (derivative.getValue().equals("add")) {
+    		//f(x) + g(x): set to df(x)/dx + dg(x)/dx
+    	} else if (derivative.getValue().equals("minus")) {
+    		//f(x) - g(x): set to df(x)/dx - dg(x)/dx
+    	} else if (derivative.getValue().equals("sin")) {
+    		//sin(f(x)): set to cos(f(x)) * df(x)/dx
+    	} else if (derivative.getValue().equals("cos")) {
+    		//cos(f(x)): set to -sin(f(x)) * df(x)/dx
+    		
+    		derivative.setValue("mult");
+    	} else if (derivative.getValue().equals("exp")) {
+    		//exp(f(x)): set to exp(f(x)) * df(x)/dx
+    		derivative.setRightChild(derivative.getLeftChild().differentiate());	//Sets the right child to be the derivative of the function in the exponent.
+    		derivative.setLeftChild(derivative.deepCopy());							//Sets the left child to be a copy of everything below the exponent in the tree.
+    		derivative.setValue("mult");
+    	} else if (derivative.getValue().equals("x")) {
+    		derivative.setValue("1");												//Base case
+    	} else {
+    		derivative.setValue("0");												//Base case
+    	}
+    	return derivative;
     }
     
     /* Extra-credit */
