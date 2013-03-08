@@ -169,28 +169,29 @@ class expressionTreeNode {
     	} else if (derivative.getValue().equals("sin")) {
     		//sin(f(x)): set to cos(f(x)) * df(x)/dx
     		expressionTreeNode left = new expressionTreeNode();
-    		expressionTreeNode right = new expressionTreeNode();
     		left.setLeftChild(derivative.getLeftChild());
     		left.setValue("cos");
-    		right.setLeftChild(derivative.getLeftChild().differentiate());
+    		derivative.setRightChild(derivative.getLeftChild().differentiate());
     		derivative.setLeftChild(left);
-    		derivative.setRightChild(right);
     		derivative.setValue("mult");
     		return derivative;
     	} else if (derivative.getValue().equals("cos")) {
     		//cos(f(x)): set to (left child) -sin(f(x)) * (right child) df(x)/dx
     		expressionTreeNode left = new expressionTreeNode();
     		expressionTreeNode right = new expressionTreeNode();
-    		expressionTreeNode subRight = new expressionTreeNode();
-    		left.setLeftChild(derivative.getLeftChild().differentiate());
-    		right.setValue("0");
-    		right.setLeftChild(right);
-    		right.setValue("minus");
-    		right.setRightChild(subRight);
-    		subRight.setLeftChild(derivative.getLeftChild());
+    		expressionTreeNode subRight = new expressionTreeNode();	
+    		right.setValue("mult");
     		subRight.setValue("sin");
-    		derivative.setRightChild(derivative.getLeftChild().differentiate());	//Sets right child to be the derivative of the expression contained in cos
-    		derivative.setValue("mult");
+    		subRight.setLeftChild(derivative.getLeftChild());
+    		right.setLeftChild(subRight);
+    		right.setRightChild(derivative.getLeftChild().differentiate());
+    		System.out.println("Right: " + right.toString());
+    		System.out.println("SubRight: " + subRight.toString());
+    		left.setValue("0");
+    		derivative.setLeftChild(left);
+    		System.out.println("Left: " + derivative.getLeftChild().toString());
+    		derivative.setRightChild(right);
+    		derivative.setValue("minus");
     		return derivative;
     	} else if (derivative.getValue().equals("exp")) {
     		//exp(f(x)): set to exp(f(x)) * df(x)/dx
@@ -206,14 +207,6 @@ class expressionTreeNode {
     		return derivative;
     	}
     }
-    
-    /* Extra-credit */
-    expressionTreeNode simplify() {
-    // WRITE YOUR CODE HERE
-
-    return null; // remove this
-    }
-
     
     public static void main(String args[]) {
         expressionTreeNode e = new expressionTreeNode("mult(add(2,x),exp(x))");
