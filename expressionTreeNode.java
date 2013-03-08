@@ -114,7 +114,6 @@ class expressionTreeNode {
     double evaluate(double x) {
         System.out.println(this.getLeftChild() + " " + this.getRightChild());
     	if (this.getValue().equals("mult")) {
-    		//System.out.println("Mult: " + this.getLeftChild().evaluate(x) * this.getRightChild().evaluate(x));
     		return (this.getLeftChild().evaluate(x) * this.getRightChild().evaluate(x));
     	} else if (this.getValue().equals("add")) {
     		System.out.println("Add: " + this.getLeftChild().evaluate(x) + this.getRightChild().evaluate(x));
@@ -124,7 +123,6 @@ class expressionTreeNode {
     	} else if (this.getValue().equals("sin")) {
     		return (Math.sin(this.getLeftChild().evaluate(x)));
     	} else if (this.getValue().equals("cos")) {
-    		//System.out.println("Cos: " + Math.cos(this.getLeftChild().evaluate(x)));
     		return (Math.cos(this.getLeftChild().evaluate(x)));
     	} else if (this.getValue().equals("exp")) {
     		return (Math.exp(this.getLeftChild().evaluate(x)));
@@ -141,57 +139,54 @@ class expressionTreeNode {
     /* returns the root of a new expression tree representing the derivative of the
     expression represented by the tree rooted at the node on which it is called ***/
     expressionTreeNode differentiate() {
-    	expressionTreeNode derivative = this.deepCopy();
+    	expressionTreeNode derivative = this.deepCopy();							//It is a new expression tree.  This creates the new tree to manipulate.
     	if (derivative.getValue().equals("mult")) {
     		//f(x)*g(x): set to (df(x)/dx * g(x)) + (dg(x)/dx * f(x))
-    		expressionTreeNode left = new expressionTreeNode();
+    		expressionTreeNode left = new expressionTreeNode();					
     		expressionTreeNode right = new expressionTreeNode();
-    		left.setLeftChild(derivative.getLeftChild().differentiate());
-    		left.setRightChild(derivative.getRightChild());
-    		left.setValue("mult");
-    		right.setLeftChild(derivative.getLeftChild());
-    		right.setRightChild(derivative.getRightChild().differentiate());
-    		right.setValue("mult");
-    		derivative.setLeftChild(left);
-    		derivative.setRightChild(right);
+    		left.setLeftChild(derivative.getLeftChild().differentiate());			//Sets the left child of the left tree to be the derivative
+    		left.setRightChild(derivative.getRightChild());							//of the original left child.  The right child of the left tree
+    		left.setValue("mult");													//is the same as the original right child.
+    		right.setLeftChild(derivative.getLeftChild());							//Sets the right child of the right tree to be the derivative
+    		right.setRightChild(derivative.getRightChild().differentiate());		//of the original left child.  The left child of the right tree
+    		right.setValue("mult");													//is the same as the original left child.
+    		derivative.setLeftChild(left);											//Sets the new left and right trees as children of the original
+    		derivative.setRightChild(right);										//node, which becomes an adding node.
     		derivative.setValue("add");
     		return derivative;
     	} else if (derivative.getValue().equals("add")) {
     		//f(x) + g(x): set to df(x)/dx + dg(x)/dx
-    		derivative.setLeftChild(derivative.getLeftChild().differentiate());
-    		derivative.setRightChild(derivative.getRightChild().differentiate());
+    		derivative.setLeftChild(derivative.getLeftChild().differentiate());		//Take the derivative of the left and right children and
+    		derivative.setRightChild(derivative.getRightChild().differentiate());	//set the children of the original node equal to the derivatives
     		return derivative;
     	} else if (derivative.getValue().equals("minus")) {
     		//f(x) - g(x): set to df(x)/dx - dg(x)/dx
-    		derivative.setLeftChild(derivative.getLeftChild().differentiate());
-    		derivative.setRightChild(derivative.getRightChild().differentiate());
+    		derivative.setLeftChild(derivative.getLeftChild().differentiate());		//Take the derivative of the left and right children and
+    		derivative.setRightChild(derivative.getRightChild().differentiate());	//set the children of the original node equal to the derivatives
     		return derivative;
     	} else if (derivative.getValue().equals("sin")) {
     		//sin(f(x)): set to cos(f(x)) * df(x)/dx
-    		expressionTreeNode left = new expressionTreeNode();
-    		left.setLeftChild(derivative.getLeftChild());
-    		left.setValue("cos");
-    		derivative.setRightChild(derivative.getLeftChild().differentiate());
-    		derivative.setLeftChild(left);
+    		expressionTreeNode left = new expressionTreeNode();						//Create new tree to insert into derivative tree
+    		left.setLeftChild(derivative.getLeftChild());							//The child of the new tree is set to be the child of
+    		left.setValue("cos");													//the original tree.  The root of the new tree is cos.
+    		derivative.setRightChild(derivative.getLeftChild().differentiate());	//The new right child of the original tree is the derivative
+    		derivative.setLeftChild(left);											//of the original child.  The new root of the original tree is mult
     		derivative.setValue("mult");
     		return derivative;
     	} else if (derivative.getValue().equals("cos")) {
     		//cos(f(x)): set to (left child) -sin(f(x)) * (right child) df(x)/dx
-    		expressionTreeNode left = new expressionTreeNode();
+    		expressionTreeNode left = new expressionTreeNode();						//Create new trees to insert into derivative tree
     		expressionTreeNode right = new expressionTreeNode();
     		expressionTreeNode subRight = new expressionTreeNode();	
-    		right.setValue("mult");
-    		subRight.setValue("sin");
-    		subRight.setLeftChild(derivative.getLeftChild());
-    		right.setLeftChild(subRight);
-    		right.setRightChild(derivative.getLeftChild().differentiate());
-    		System.out.println("Right: " + right.toString());
-    		System.out.println("SubRight: " + subRight.toString());
-    		left.setValue("0");
-    		derivative.setLeftChild(left);
-    		System.out.println("Left: " + derivative.getLeftChild().toString());
-    		derivative.setRightChild(right);
-    		derivative.setValue("minus");
+    		right.setValue("mult");													//The new right tree is a mult type.  It has a child which
+    		subRight.setValue("sin");												//is also a new tree.  This new tree is a sin type with the child
+    		subRight.setLeftChild(derivative.getLeftChild());						//set to be the child of the original tree.
+    		right.setLeftChild(subRight);											//Sets the left child of the right tree to be the subtree.
+    		right.setRightChild(derivative.getLeftChild().differentiate());			//Sets the right child of the right tree to be the derivative of the original child.
+    		left.setValue("0");														//Sets the left node to zero; this is needed to have a negative
+    		derivative.setLeftChild(left);											//sin(f(x)).  This is set as the child of the original root.
+    		derivative.setRightChild(right);										//The whole right tree (with the subtree as a child) is set as the
+    		derivative.setValue("minus");											//right child of the original node, which is set to be minus.
     		return derivative;
     	} else if (derivative.getValue().equals("exp")) {
     		//exp(f(x)): set to exp(f(x)) * df(x)/dx
