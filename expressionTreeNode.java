@@ -112,27 +112,23 @@ class expressionTreeNode {
     // Returns the value of the the expression rooted at a given node
     // when x has a certain value
     double evaluate(double x) {
-        System.out.println(this.getLeftChild() + " " + this.getRightChild());
-    	if (this.getValue().equals("mult")) {
-    		return (this.getLeftChild().evaluate(x) * this.getRightChild().evaluate(x));
+        if (this.getValue().equals("mult")) {
+    		return (this.getLeftChild().evaluate(x) * this.getRightChild().evaluate(x));	//Recursively multiplies the result of the two children.
     	} else if (this.getValue().equals("add")) {
-    		System.out.println("Add: " + this.getLeftChild().evaluate(x) + this.getRightChild().evaluate(x));
-    		return (this.getLeftChild().evaluate(x) + this.getRightChild().evaluate(x));
+    		return (this.getLeftChild().evaluate(x) + this.getRightChild().evaluate(x));	//Recursively adds the result of the two children.
     	} else if (this.getValue().equals("minus")) {
-    		return (this.getLeftChild().evaluate(x) - this.getRightChild().evaluate(x));
+    		return (this.getLeftChild().evaluate(x) - this.getRightChild().evaluate(x));	//Recursively subtracts the result of the two children.
     	} else if (this.getValue().equals("sin")) {
-    		return (Math.sin(this.getLeftChild().evaluate(x)));
+    		return (Math.sin(this.getLeftChild().evaluate(x)));								//Recursively evaluates sin of the result of the child.
     	} else if (this.getValue().equals("cos")) {
-    		return (Math.cos(this.getLeftChild().evaluate(x)));
+    		return (Math.cos(this.getLeftChild().evaluate(x)));								//Recursively evaluates cos of the result of the child.
     	} else if (this.getValue().equals("exp")) {
-    		return (Math.exp(this.getLeftChild().evaluate(x)));
+    		return (Math.exp(this.getLeftChild().evaluate(x)));								//Recusively evaluates the exponential of the result of the child.
     	} else if (this.getValue().equals("x")) {
-    		System.out.println("x Leaf");
-    		return x;
+    		return x;																		//Base case
     	} else {
-    		System.out.println("Leaf");
-    		String value = this.toString();
-    		return Integer.parseInt(value);
+    		String value = this.toString();													//Base case (pulls the string and parses into
+    		return Integer.parseInt(value);													//an integer)
     	}
     }                         
 
@@ -204,7 +200,7 @@ class expressionTreeNode {
     }
     
     public static void main(String args[]) {
-        expressionTreeNode e = new expressionTreeNode("mult(add(2,x),exp(x))");
+        expressionTreeNode e = new expressionTreeNode("mult(add(2,x),cos(x))");
         System.out.println(e);
         System.out.println(e.evaluate(1));
         System.out.println(e.differentiate());
