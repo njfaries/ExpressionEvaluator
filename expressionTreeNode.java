@@ -144,28 +144,67 @@ class expressionTreeNode {
     	expressionTreeNode derivative = this.deepCopy();
     	if (derivative.getValue().equals("mult")) {
     		//f(x)*g(x): set to (df(x)/dx * g(x)) + (dg(x)/dx * f(x))
+    		expressionTreeNode left = new expressionTreeNode();
+    		expressionTreeNode right = new expressionTreeNode();
+    		left.setLeftChild(derivative.getLeftChild().differentiate());
+    		left.setRightChild(derivative.getRightChild());
+    		left.setValue("mult");
+    		right.setLeftChild(derivative.getLeftChild());
+    		right.setRightChild(derivative.getRightChild().differentiate());
+    		right.setValue("mult");
+    		derivative.setLeftChild(left);
+    		derivative.setRightChild(right);
     		derivative.setValue("add");
+    		return derivative;
     	} else if (derivative.getValue().equals("add")) {
     		//f(x) + g(x): set to df(x)/dx + dg(x)/dx
+    		derivative.setLeftChild(derivative.getLeftChild().differentiate());
+    		derivative.setRightChild(derivative.getRightChild().differentiate());
+    		return derivative;
     	} else if (derivative.getValue().equals("minus")) {
     		//f(x) - g(x): set to df(x)/dx - dg(x)/dx
+    		derivative.setLeftChild(derivative.getLeftChild().differentiate());
+    		derivative.setRightChild(derivative.getRightChild().differentiate());
+    		return derivative;
     	} else if (derivative.getValue().equals("sin")) {
     		//sin(f(x)): set to cos(f(x)) * df(x)/dx
-    	} else if (derivative.getValue().equals("cos")) {
-    		//cos(f(x)): set to -sin(f(x)) * df(x)/dx
-    		
+    		expressionTreeNode left = new expressionTreeNode();
+    		expressionTreeNode right = new expressionTreeNode();
+    		left.setLeftChild(derivative.getLeftChild());
+    		left.setValue("cos");
+    		right.setLeftChild(derivative.getLeftChild().differentiate());
+    		derivative.setLeftChild(left);
+    		derivative.setRightChild(right);
     		derivative.setValue("mult");
+    		return derivative;
+    	} else if (derivative.getValue().equals("cos")) {
+    		//cos(f(x)): set to (left child) -sin(f(x)) * (right child) df(x)/dx
+    		expressionTreeNode left = new expressionTreeNode();
+    		expressionTreeNode right = new expressionTreeNode();
+    		expressionTreeNode subRight = new expressionTreeNode();
+    		left.setLeftChild(derivative.getLeftChild().differentiate());
+    		right.setValue("0");
+    		right.setLeftChild(right);
+    		right.setValue("minus");
+    		right.setRightChild(subRight);
+    		subRight.setLeftChild(derivative.getLeftChild());
+    		subRight.setValue("sin");
+    		derivative.setRightChild(derivative.getLeftChild().differentiate());	//Sets right child to be the derivative of the expression contained in cos
+    		derivative.setValue("mult");
+    		return derivative;
     	} else if (derivative.getValue().equals("exp")) {
     		//exp(f(x)): set to exp(f(x)) * df(x)/dx
     		derivative.setRightChild(derivative.getLeftChild().differentiate());	//Sets the right child to be the derivative of the function in the exponent.
     		derivative.setLeftChild(derivative.deepCopy());							//Sets the left child to be a copy of everything below the exponent in the tree.
     		derivative.setValue("mult");
+    		return derivative;
     	} else if (derivative.getValue().equals("x")) {
     		derivative.setValue("1");												//Base case
+    		return derivative;
     	} else {
     		derivative.setValue("0");												//Base case
+    		return derivative;
     	}
-    	return derivative;
     }
     
     /* Extra-credit */
@@ -177,7 +216,7 @@ class expressionTreeNode {
 
     
     public static void main(String args[]) {
-        expressionTreeNode e = new expressionTreeNode("mult(add(2,x),cos(x))");
+        expressionTreeNode e = new expressionTreeNode("mult(add(2,x),exp(x))");
         System.out.println(e);
         System.out.println(e.evaluate(1));
         System.out.println(e.differentiate());
